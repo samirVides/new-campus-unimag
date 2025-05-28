@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Search, Filter, Book, X, Upload, Trash2 } from 'lucide-react';
+import { Plus, Search, Filter, Book, X, Upload } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import styles from './TeacherCourses.module.css';
 
@@ -7,21 +7,19 @@ const TeacherCourses = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterActive, setFilterActive] = useState(false);
   const [showNewCourseModal, setShowNewCourseModal] = useState(false);
-  const [courses, setCourses] = useState([
-    {
-      id: 1,
-      name: 'Inglés III',
-      code: 'G16',
-      program: 'Aeronáutica',
-      students: 32,
-      schedule: 'Lunes y Miércoles 10:00 - 12:00',
-      active: true,
-      description: 'Curso de inglés nivel intermedio',
-      semester: '2025-I',
-      faculty: 'Ingeniería',
-      syllabus: null
-    }
-  ]);
+  const [courses, setCourses] = useState<Array<{
+    id: number;
+    name: string;
+    code: string;
+    program: string;
+    students: number;
+    schedule: string[];
+    active: boolean;
+    description: string;
+    semester: string;
+    faculty: string;
+    syllabus: File | null;
+  }>>([]);
 
   const [newCourseData, setNewCourseData] = useState({
     name: '',
@@ -29,7 +27,7 @@ const TeacherCourses = () => {
     description: '',
     semester: '2025-I',
     faculty: '',
-    schedule: [],
+    schedule: [] as string[],
     syllabus: null as File | null,
     status: 'active'
   });
@@ -130,35 +128,43 @@ const TeacherCourses = () => {
       </div>
 
       <div className={styles.coursesList}>
-        {filteredCourses.map((course) => (
-          <Link to="/teacher/content\" key={course.id} className={styles.courseCard}>
-            <div className={styles.courseIcon}>
-              <Book size={24} />
-            </div>
-            <div className={styles.courseDetails}>
-              <div className={styles.courseHeader}>
-                <h3>{course.name}</h3>
-                <span className={`${styles.courseStatus} ${course.active ? styles.statusActive : styles.statusInactive}`}>
-                  {course.active ? 'Activo' : 'Inactivo'}
-                </span>
+        {filteredCourses.length === 0 ? (
+          <div className={styles.emptyState}>
+            <Book size={48} />
+            <h2>No hay cursos disponibles</h2>
+            <p>Comience creando un nuevo curso haciendo clic en el botón "Nuevo Curso"</p>
+          </div>
+        ) : (
+          filteredCourses.map((course) => (
+            <Link to="/teacher/content" key={course.id} className={styles.courseCard}>
+              <div className={styles.courseIcon}>
+                <Book size={24} />
               </div>
-              <div className={styles.courseInfo}>
-                <span className={styles.courseCode}>{course.code}</span>
-                <span className={styles.programName}>{course.program}</span>
-              </div>
-              <div className={styles.courseStats}>
-                <div className={styles.statItem}>
-                  <span className={styles.statLabel}>Estudiantes:</span>
-                  <span className={styles.statValue}>{course.students}</span>
+              <div className={styles.courseDetails}>
+                <div className={styles.courseHeader}>
+                  <h3>{course.name}</h3>
+                  <span className={`${styles.courseStatus} ${course.active ? styles.statusActive : styles.statusInactive}`}>
+                    {course.active ? 'Activo' : 'Inactivo'}
+                  </span>
                 </div>
-                <div className={styles.statItem}>
-                  <span className={styles.statLabel}>Horario:</span>
-                  <span className={styles.statValue}>{course.schedule}</span>
+                <div className={styles.courseInfo}>
+                  <span className={styles.courseCode}>{course.code}</span>
+                  <span className={styles.programName}>{course.program}</span>
+                </div>
+                <div className={styles.courseStats}>
+                  <div className={styles.statItem}>
+                    <span className={styles.statLabel}>Estudiantes:</span>
+                    <span className={styles.statValue}>{course.students}</span>
+                  </div>
+                  <div className={styles.statItem}>
+                    <span className={styles.statLabel}>Horario:</span>
+                    <span className={styles.statValue}>{course.schedule.join(', ')}</span>
+                  </div>
                 </div>
               </div>
-            </div>
-          </Link>
-        ))}
+            </Link>
+          ))
+        )}
       </div>
 
       {showNewCourseModal && (
@@ -183,6 +189,7 @@ const TeacherCourses = () => {
                     value={newCourseData.name}
                     onChange={(e) => setNewCourseData({...newCourseData, name: e.target.value})}
                     required
+                    placeholder="Ej: Inglés III"
                   />
                 </div>
 
@@ -194,6 +201,7 @@ const TeacherCourses = () => {
                     value={newCourseData.code}
                     onChange={(e) => setNewCourseData({...newCourseData, code: e.target.value})}
                     required
+                    placeholder="Ej: G16"
                   />
                 </div>
 
@@ -204,6 +212,7 @@ const TeacherCourses = () => {
                     value={newCourseData.description}
                     onChange={(e) => setNewCourseData({...newCourseData, description: e.target.value})}
                     rows={3}
+                    placeholder="Describa brevemente el curso..."
                   />
                 </div>
 
@@ -272,6 +281,7 @@ const TeacherCourses = () => {
                       id="courseSyllabus"
                       onChange={handleFileChange}
                       style={{ display: 'none' }}
+                      accept=".pdf,.doc,.docx"
                     />
                   </label>
                 </div>
