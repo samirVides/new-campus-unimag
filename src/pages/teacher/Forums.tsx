@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, MessageSquare, Search, Users, Clock, X, Upload } from 'lucide-react';
+import { Plus, Search, MessageSquare, Users, Clock, X, Upload, Trash2 } from 'lucide-react';
 import styles from './Forums.module.css';
 
 const Forums = () => {
@@ -79,6 +79,15 @@ const Forums = () => {
     }
   };
 
+  const handleDeleteForum = (forumId: number, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent forum selection when clicking delete
+    const updatedForums = forums.filter(forum => forum.id !== forumId);
+    setForums(updatedForums);
+    if (selectedForum === forumId) {
+      setSelectedForum(null);
+    }
+  };
+
   return (
     <div className={styles.forumsPage}>
       <div className={styles.pageHeader}>
@@ -131,6 +140,13 @@ const Forums = () => {
                     </span>
                   </div>
                 </div>
+                <button 
+                  className={styles.deleteButton}
+                  onClick={(e) => handleDeleteForum(forum.id, e)}
+                  title="Eliminar foro"
+                >
+                  <Trash2 size={16} />
+                </button>
               </div>
             ))}
             {filteredForums.length === 0 && (
