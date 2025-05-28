@@ -131,7 +131,7 @@ const TeacherCourses = () => {
 
       <div className={styles.coursesList}>
         {filteredCourses.map((course) => (
-          <Link to="/teacher/content" key={course.id} className={styles.courseCard}>
+          <Link to="/teacher/content\" key={course.id} className={styles.courseCard}>
             <div className={styles.courseIcon}>
               <Book size={24} />
             </div>
