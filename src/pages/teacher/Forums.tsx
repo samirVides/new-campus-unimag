@@ -1,11 +1,20 @@
 import React, { useState } from 'react';
-import { Plus, MessageSquare, Search, Users, Clock } from 'lucide-react';
+import { Plus, MessageSquare, Search, Users, Clock, X, Upload } from 'lucide-react';
 import styles from './Forums.module.css';
 
 const Forums = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedForum, setSelectedForum] = useState<number | null>(1);
   const [newPost, setNewPost] = useState('');
+  const [showNewForumModal, setShowNewForumModal] = useState(false);
+  const [newForumData, setNewForumData] = useState({
+    title: '',
+    course: '',
+    openDate: '',
+    closeDate: '',
+    allowStudentReplies: false,
+    attachment: null as File | null
+  });
 
   const forums = [
     {
@@ -90,6 +99,12 @@ const Forums = () => {
     }
   ];
 
+  const courses = [
+    'Inglés III - G16',
+    'Sistemas Operativos - G2',
+    'Ingeniería de Software - G4'
+  ];
+
   const filteredForums = forums.filter((forum) =>
     forum.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     forum.description.toLowerCase().includes(searchTerm.toLowerCase())
@@ -103,16 +118,41 @@ const Forums = () => {
 
   const handleSubmitPost = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, this would submit the post to the backend
     console.log('New post submitted:', newPost);
     setNewPost('');
+  };
+
+  const handleNewForumSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('New forum data:', newForumData);
+    setShowNewForumModal(false);
+    setNewForumData({
+      title: '',
+      course: '',
+      openDate: '',
+      closeDate: '',
+      allowStudentReplies: false,
+      attachment: null
+    });
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setNewForumData({
+        ...newForumData,
+        attachment: e.target.files[0]
+      });
+    }
   };
 
   return (
     <div className={styles.forumsPage}>
       <div className={styles.pageHeader}>
         <h1>Foros de Discusión</h1>
-        <button className={styles.newForumButton}>
+        <button 
+          className={styles.newForumButton}
+          onClick={() => setShowNewForumModal(true)}
+        >
           <Plus size={16} /> Nuevo Foro
         </button>
       </div>
@@ -234,6 +274,119 @@ const Forums = () => {
           </div>
         )}
       </div>
+
+      {showNewForumModal && (
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
+            <div className={styles.modalHeader}>
+              <h2>Crear Nuevo Foro</h2>
+              <button 
+                className={styles.closeButton}
+                onClick={() => setShowNewForumModal(false)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <form onSubmit={handleNewForumSubmit}>
+              <div className={styles.modalBody}>
+                <div className={styles.formGroup}>
+                  <label htmlFor="forumTitle">Título del foro</label>
+                  <input
+                    type="text"
+                    id="forumTitle"
+                    value={newForumData.title}
+                    onChange={(e) => setNewForumData({...newForumData, title: e.target.value})}
+                    required
+                  />
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label htmlFor="forumCourse">Curso</label>
+                  <select
+                    id="forumCourse"
+                    value={newForumData.course}
+                    onChange={(e) => setNewForumData({...newForumData, course: e.target.value})}
+                    required
+                  >
+                    <option value="">Seleccionar curso</option>
+                    {courses.map((course) => (
+                      <option key={course} value={course}>
+                        {course}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className={styles.formGroup}>
+                  <div className={styles.dateInputs}>
+                    <div>
+                      <label htmlFor="openDate">Fecha de apertura</label>
+                      <input
+                        type="date"
+                        id="openDate"
+                        value={newForumData.openDate}
+                        onChange={(e) => setNewForumData({...newForumData, openDate: e.target.value})}
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="closeDate">Fecha de cierre</label>
+                      <input
+                        type="date"
+                        id="closeDate"
+                        value={newForumData.closeDate}
+                        onChange={(e) => setNewForumData({...newForumData, closeDate: e.target.value})}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                <div className={styles.formGroup}>
+                  <div className={styles.checkboxGroup}>
+                    <input
+                      type="checkbox"
+                      id="allowReplies"
+                      checked={newForumData.allowStudentReplies}
+                      onChange={(e) => setNewForumData({...newForumData, allowStudentReplies: e.target.checked})}
+                    />
+                    <label htmlFor="allowReplies">Permitir respuestas entre estudiantes</label>
+                  </div>
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label htmlFor="attachment">Archivo adjunto</label>
+                  <label className={styles.fileInput} htmlFor="attachment">
+                    <Upload className={styles.fileInputIcon} size={20} />
+                    <span className={styles.fileInputText}>
+                      {newForumData.attachment
+                        ? newForumData.attachment.name
+                        : 'Haz clic para subir un archivo'}
+                    </span>
+                    <input
+                      type="file"
+                      id="attachment"
+                      onChange={handleFileChange}
+                      style={{ display: 'none' }}
+                    />
+                  </label>
+                </div>
+              </div>
+
+              <div className={styles.modalFooter}>
+                <button
+                  type="button"
+                  className={styles.cancelButton}
+                  onClick={() => setShowNewForumModal(false)}
+                >
+                  Cancelar
+                </button>
+                <button type="submit" className={styles.createButton}>
+                  Crear Foro
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
