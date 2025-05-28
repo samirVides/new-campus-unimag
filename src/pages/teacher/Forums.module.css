@@ -427,6 +427,31 @@
   background-color: #2845d1;
 }
 
+.deleteButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: none;
+  border: none;
+  color: var(--danger-color);
+  opacity: 0;
+  transition: var(--transition-default);
+  cursor: pointer;
+  margin-left: 1rem;
+}
+
+.forumItem:hover .deleteButton {
+  opacity: 1;
+}
+
+.deleteButton:hover {
+  background-color: var(--danger-color);
+  color: white;
+  border-radius: 0.25rem;
+}
+
 @media (max-width: 992px) {
   .forumsLayout {
     grid-template-columns: 1fr;
